@@ -1,0 +1,72 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+const int V = 7;
+
+void printGraph(vector<pair<int, int>> adj[]) {
+    for(int source = 0; source < V; source++) {
+        for(auto &neighbour: adj[source]) {
+            int dest = neighbour.first;
+            int weight = neighbour.second;
+            cout<<"Source : "<<source<<"| Destination : "<<dest<<" | Weight : "<<weight<<endl;
+        }
+    }
+}
+
+void addEdge(vector<pair<int, int>> adj[], int source, int destination, int weight) {
+    adj[source].push_back({destination, weight});
+    adj[destination].push_back({source, weight});
+}
+
+int main() {
+    
+    vector<pair<int, int>> adj[V];
+    priority_queue<pair<int, pair<int, int>>, vector<pair<int, pair<int, int>>>, greater<pair<int, pair<int, int>>>> pq;
+    vector<int> inMST(V, 0);
+    vector<int> parent(V, -1);
+    
+    addEdge(adj, 0, 1, 5);
+    addEdge(adj, 0, 3, 20);
+    addEdge(adj, 1, 2, 5);
+    addEdge(adj, 2, 3, 5);
+    addEdge(adj, 3, 4, 1);
+    addEdge(adj, 4, 5, 2);
+    addEdge(adj, 4, 6, 4);
+    addEdge(adj, 5, 6, 2);
+    
+    printGraph(adj);
+    
+    int sum = 0;
+    pq.push({0, {0, -1}});
+    
+    while(!pq.empty()) {
+    
+        int wt = pq.top().first;
+        int node = pq.top().second.first;
+        int source = pq.top().second.second;
+        pq.pop();
+        
+        if(!inMST[node]) {
+            inMST[node] = 1;
+            sum += wt;
+        }
+        
+        for(auto &neighbour: adj[node]) {
+            int adjWt = neighbour.second;
+            int adjNode = neighbour.first;
+            if(!inMST[adjNode]) {
+                pq.push({adjWt, {adjNode, node}});
+                parent[adjNode] = node;
+            }
+        }
+    }
+    
+    cout<<"Sum of minimum spanning tree is :- "<<sum<<endl;
+    
+    cout<<"Minimum spanning tree is : "<<endl;
+    for(int i = 0; i < V; i++) {
+        cout<<parent[i]<<" -> ";
+    }
+    
+    return 0;
+}
